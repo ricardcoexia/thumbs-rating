@@ -8,10 +8,17 @@ function thumbs_rating_vote(ID, type)
 
 	jQuery.post(thumbs_rating_ajax.ajax_url, data, function(response) {
 
-		var caontainer = '#thumbs-rating-' + ID;
+		var container = '#thumbs-rating-' + ID;
 		
-		jQuery(caontainer).html('');
+		var object = jQuery(container);
 		
-		jQuery(caontainer).append(response);
+		jQuery(container).html('');
+		
+		jQuery(container).append(response);
+		
+				
+		jQuery(object).removeClass('thumbs-rating-container');
+		jQuery(object).attr('id', '');
+
 	});
 }

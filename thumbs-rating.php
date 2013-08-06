@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: Thumbs Rating
-Plugin URI: http://php.quicoto.com/
+Plugin URI:
 Description: Add thumbs up/down rating to your content.
 Author: Ricard Torres
-Version: 0.1
+Version: 1.0
 Author URI: http://php.quicoto.com/
 */
 
@@ -32,6 +32,13 @@ if  ( ! function_exists( 'thumbs_rating_init' ) ):
 
 endif;
 
+
+/*-----------------------------------------------------------------------------------*/
+/* Define text string */
+/*-----------------------------------------------------------------------------------*/
+
+define('thumbs_rating_up_text', __('Vote Up','thumbs-rating'));
+define('thumbs_rating_down_text', __('Vote Down','thumbs-rating'));
 
 
 /*-----------------------------------------------------------------------------------*/
@@ -72,18 +79,20 @@ endif;
 
 if  ( ! function_exists( 'thumbs_rating_getlink' ) ): 
 
-	function thumbs_rating_getlink()
+	function thumbs_rating_getlink($post_ID = '')
 	{
 		$thumbs_rating_link = "";
-		$post_ID = get_the_ID();
+		
+		if( $post_ID == '' ) $post_ID = get_the_ID();
+		
 		$thumbs_rating_up_count = get_post_meta($post_ID, '_thumbs_rating_up', true) != '' ? get_post_meta($post_ID, '_thumbs_rating_up', true) : '0';
 		$thumbs_rating_down_count = get_post_meta($post_ID, '_thumbs_rating_down', true) != '' ? get_post_meta($post_ID, '_thumbs_rating_down', true) : '0';
-		$link_up = ' <a class="thumbs-rating-up" onclick="thumbs_rating_vote(' . $post_ID . ', 1);">' . __('Vote Up','thumbs-rating') . '</a> ' . $thumbs_rating_up_count;
-		 $link_down = '<a class="thumbs-rating-down" onclick="thumbs_rating_vote(' . $post_ID . ', 0);">' . __('Vote Down','thumbs-rating') . '</a> ' . $thumbs_rating_down_count;
+		$link_up = '<span class="thumbs-rating-up" onclick="thumbs_rating_vote(' . $post_ID . ', 1);" data-text="' . thumbs_rating_up_text . '"> +' . $thumbs_rating_up_count . '</span>';
+		 $link_down = '<span class="thumbs-rating-down" onclick="thumbs_rating_vote(' . $post_ID . ', 0);" data-text="' . thumbs_rating_down_text . '"> -' . $thumbs_rating_down_count . '</span>';
 		$thumbs_rating_link = '<div  class="thumbs-rating-container" id="thumbs-rating-'.$post_ID.'">';
-		$thumbs_rating_link .= '<span>'.$link_up.'</span>';
+		$thumbs_rating_link .= $link_up;
 		$thumbs_rating_link .= ' - ';
-		$thumbs_rating_link .= '<span>'.$link_down.'</span>';
+		$thumbs_rating_link .= $link_down;
 		$thumbs_rating_link .= '</div>';
 		
 		return $thumbs_rating_link;
@@ -91,13 +100,18 @@ if  ( ! function_exists( 'thumbs_rating_getlink' ) ):
 	
 endif;
 
-if  ( ! function_exists( 'thumbs_rating_printlink' ) ): 
 
-	function thumbs_rating_printlink($content)
+/*-----------------------------------------------------------------------------------*/
+/* Add the Thumbs Rating links to the_content  */
+/*-----------------------------------------------------------------------------------*/
+
+if  ( ! function_exists( 'thumbs_rating_print' ) ): 
+
+	function thumbs_rating_print($content)
 	{
 		return $content.thumbs_rating_getlink();
 	}
-	add_filter('the_content', thumbs_rating_printlink);
+	add_filter('the_content', thumbs_rating_print);
 
 endif;
 
@@ -140,8 +154,10 @@ if  ( ! function_exists( 'thumbs_rating_add_vote_callback' ) ):
 		update_post_meta($post_ID, $meta_name, $thumbs_rating_count);
 		
 		// Return the count without links
+		// I strip the tags so I don't show the <a> again, to prevent them to vote.
+		// We might implement HTML5 local storage in a near future.
 					
-		$results='Thanks, refresh!';
+		$results = strip_tags( thumbs_rating_getlink($post_ID), '<div><span>');
 
 		die($results);
 	}
