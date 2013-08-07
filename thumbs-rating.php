@@ -102,9 +102,11 @@ endif;
 
 
 /*-----------------------------------------------------------------------------------*/
-/* Add the Thumbs Rating links to the_content  */
+/* Print the Thumbs Rating links to the_content  */
+/* We've commented this part because the user will control where to show the thumbs */
 /*-----------------------------------------------------------------------------------*/
 
+/*
 if  ( ! function_exists( 'thumbs_rating_print' ) ): 
 
 	function thumbs_rating_print($content)
@@ -114,6 +116,7 @@ if  ( ! function_exists( 'thumbs_rating_print' ) ):
 	add_filter('the_content', thumbs_rating_print);
 
 endif;
+*/
 
 
 /*-----------------------------------------------------------------------------------*/
